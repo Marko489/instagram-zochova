@@ -12,7 +12,7 @@ import Container from '@mui/material/Container';
 
 export const metadata = {title: 'Registracia | ZoskaSnap'}
 
-export default function Registration() {
+export default function SignUp() {
   return (
     <Container>
         <Typography>Registracia</Typography>
