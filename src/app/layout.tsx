@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import BottomNavBar from '/home/nikitagregusova@s.zochova.sk/Dokumenty/dev/prve/src/components/BottomNavBar.tsx';
 
 
 
@@ -17,6 +18,7 @@ export default function RootLayout({
     <html lang="sk">
       <body>
         {children}
+        <BottomNavBar />
       </body>
     </html>
   );
