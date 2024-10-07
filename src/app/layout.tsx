@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import BottomNavBar from '/home/nikitagregusova@s.zochova.sk/Dokumenty/dev/prve/src/components/BottomNavBar.tsx';
+import BottomNavBar from '../components/BottomNavBar';
 
 
 
