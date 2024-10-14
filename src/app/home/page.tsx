@@ -12,26 +12,26 @@
 //   );
 // }
 
-"use client"; // Ensure this is a client-side component
+"use client";
 
 import { useSession } from "next-auth/react";
-import AuthHomeView from "../sections/AuthHomeView"; // Correct relative path
-import NonAuthHomeView from "../sections/NonAuthHomeView";
+import AuthHomeView from "../sections/AuthHomeView"; // Authenticated user view
+import NonAuthHomeView from "../sections/NonAuthHomeView"; // Non-authenticated user view
 import Typography from "@mui/material/Typography";
 
 export default function Home() {
   const { data: session, status } = useSession();
 
-  // Show loading state while session is being fetched
+  // Loading state
   if (status === "loading") {
     return <Typography>Loading...</Typography>;
   }
 
-  // Show authenticated view if the user is logged in
+  // Show Authenticated View
   if (session) {
     return <AuthHomeView />;
   }
 
-  // Show non-authenticated view otherwise
+  // Show Non-Authenticated View
   return <NonAuthHomeView />;
 }
