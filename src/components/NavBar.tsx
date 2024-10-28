@@ -1,50 +1,75 @@
-"use client"; // Add this line
+// /src/components/Navbar.tsx
+
+"use client";
 
 import * as React from 'react';
-import { BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
+import { BottomNavigation, BottomNavigationAction, Box, Avatar } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
-import PersonIcon from '@mui/icons-material/Person';
-import AddBoxIcon from '@mui/icons-material/AddBox'; // Post icon
-import LoginIcon from '@mui/icons-material/Login'; // Login icon
-import HowToRegIcon from '@mui/icons-material/HowToReg'; // Registration icon
+import SearchIcon from '@mui/icons-material/Search';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import LoginIcon from '@mui/icons-material/Login';
+import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { useRouter } from 'next/navigation';
+import { useSession } from "next-auth/react";
 
-export default function BottomNavBar() {
-  const [value, setValue] = React.useState(0);
+export default function Navbar() {
+  const [value, setValue] = React.useState('/');
   const router = useRouter();
+  const { data: session, status } = useSession();
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleNavigation = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
-    switch (newValue) {
-      case 0:
-        router.push('/(home)');
-        break;
-      case 1:
-        router.push('/profile');
-        break;
-      case 2:
-        router.push('/post'); // Update this path to your post creation page
-        break;
-      case 3:
-        router.push('/login'); // Update this path to your login page
-        break;
-      case 4:
-        router.push('/registration'); // Update this path to your registration page
-        break;
-      default:
-        break;
-    }
+    router.push(newValue);
   };
 
+  // Non-authenticated navigation paths
+  const nonAuthPaths = [
+    { label: "Domov", value: "/", icon: <HomeIcon /> },
+    { label: "Prispevky", value: "/prispevok", icon: <AddCircleIcon /> },
+    { label: "Registrácia", value: "/auth/registracia", icon: <AppRegistrationIcon /> },
+    { label: "Prihlásenie", value: "/auth/prihlasenie", icon: <LoginIcon /> }
+  ];
+
+  // Authenticated navigation paths
+  const authPaths = [
+    { label: "Domov", value: "/", icon: <HomeIcon /> },
+    { label: "Hľadať", value: "/hladat", icon: <SearchIcon /> },
+    { label: "Pridať", value: "/prispevok", icon: <AddCircleIcon /> },
+    {
+      label: "Profil",
+      value: "/profil",
+      icon: session?.user?.image ? (
+        <Avatar 
+          alt={session?.user?.name || "User"} 
+          src={session?.user?.image || undefined} 
+        />
+      ) : (
+        <Avatar>{session?.user?.name?.charAt(0) || "U"}</Avatar>
+      )
+    },
+    { label: "Odhlásiť", value: "/auth/odhlasenie", icon: <LogoutIcon /> },
+  ];
+
+  // Decide which paths to use based on authentication status
+  const navigationPaths = status === "authenticated" ? authPaths : nonAuthPaths;
+
   return (
-    <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
-      <BottomNavigation value={value} onChange={handleChange}>
-        <BottomNavigationAction label="Home" icon={<HomeIcon />} />
-        <BottomNavigationAction label="Profile" icon={<PersonIcon />} />
-        <BottomNavigationAction label="Post" icon={<AddBoxIcon />} />
-        <BottomNavigationAction label="Login" icon={<LoginIcon />} />
-        <BottomNavigationAction label="Registration" icon={<HowToRegIcon />} />
+    <Box sx={{ width: '100%', position: 'fixed', bottom: 0 }}>
+      <BottomNavigation
+        showLabels
+        value={value}
+        onChange={handleNavigation}
+      >
+        {navigationPaths.map((path) => (
+          <BottomNavigationAction
+            key={path.value}
+            label={path.label}
+            value={path.value}
+            icon={path.icon}
+          />
+        ))}
       </BottomNavigation>
-    </Paper>
+    </Box>
   );
 }
