@@ -1,33 +1,16 @@
-"use client";
+// src/sections/NonAuthHomeView.tsx
 
-import { useRouter } from "next/navigation";
-import { Typography, Button, Box } from "@mui/material";
+import { Container, Typography } from "@mui/material";
 
 export default function NonAuthHomeView() {
-  const router = useRouter();
-
   return (
-    <Box sx={{ textAlign: "center", padding: 4 }}>
-      <Typography variant="h4" gutterBottom>Vitaj na ZoškaSnap!</Typography>
-      <Typography variant="body1" gutterBottom>Zaregistruj sa a pridaj sa k našej komunite!</Typography>
-
-      {/* Call to Action Buttons */}
-      <Button
-        variant="contained"
-        color="primary"
-        sx={{ margin: 1 }}
-        onClick={() => router.push('/login')}
-      >
-        Log In
-      </Button>
-      <Button
-        variant="outlined"
-        color="secondary"
-        sx={{ margin: 1 }}
-        onClick={() => router.push('/registration')}
-      >
-        Sign Up
-      </Button>
-    </Box>
+    <Container>
+      <Typography variant="body1" sx={{ mt: 2 }}>
+        Domovská stránka - NEprihlásený user
+      </Typography>
+      <Typography>
+        Registrujte sa, aby ste mohli pridať príspevky a zobraziť profil.
+      </Typography>
+    </Container>
   );
 }

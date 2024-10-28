@@ -12,33 +12,18 @@
 //   );
 // }
 
-"use client";
 
-import { useSession } from "next-auth/react";
-import AuthHomeView from "../sections/AuthHomeView"; // Authenticated user view
-import NonAuthHomeView from "../sections/NonAuthHomeView"; // Non-authenticated user view
-import Typography from "@mui/material/Typography";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/authOptions";
+import AuthHomeView from "../sections/AuthHomeView";
+import NonAuthHomeView from "../sections/NonAuthHomeView";
 
-export default function Home() {
-  const { data: session, status } = useSession();
+export const metadata = { title: "Domov | ZoškaSnap" };
 
-  // Loading state
-  if (status === "loading") {
-    return <Typography>Loading...</Typography>;
-  }
+export default async function HomePage() {
+  // Fetch session on the server
+  const session = await getServerSession(authOptions);
 
-  // Show Authenticated View
-  if (session) {
-    return <AuthHomeView />;
-  }
-
-  // Show Non-Authenticated View
-  return <NonAuthHomeView />;
+  // Conditionally render authenticated or non-authenticated home view
+  return session ? <AuthHomeView session={session} /> : <NonAuthHomeView />;
 }
-
-
-
-
-
-
-
