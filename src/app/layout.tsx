@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import "./globals.css";
-import Navbar from "@/components/BottomNavBar";
+import Navbar from "../components/NavBar";
 import AuthProvider from "../components/AuthProvider";
 
 export const metadata: Metadata = {
@@ -22,7 +22,7 @@ export default function RootLayout({
               {children}
             </main>
           </div>
-          <Navbar /> {/* Moved Navbar outside of the main container */}
+          <Navbar /> 
         </AuthProvider>
       </body>
     </html>
