@@ -1,3 +1,4 @@
+
 // /src/components/Navbar.tsx
 
 "use client";
@@ -26,7 +27,9 @@ export default function Navbar() {
   // Non-authenticated navigation paths
   const nonAuthPaths = [
     { label: "Domov", value: "/", icon: <HomeIcon /> },
-    { label: "Prispevky", value: "/prispevok", icon: <AddCircleIcon /> },
+    { label: "Podmienky", value: "/podmienky", icon: <AddCircleIcon /> },
+    { label: "GDPR", value: "/gdpr", icon: <HomeIcon /> },
+    { label: "O-mne", value: "/o-mne", icon: <HomeIcon /> },
     { label: "Registrácia", value: "/auth/registracia", icon: <AppRegistrationIcon /> },
     { label: "Prihlásenie", value: "/auth/prihlasenie", icon: <LoginIcon /> }
   ];
@@ -34,8 +37,10 @@ export default function Navbar() {
   // Authenticated navigation paths
   const authPaths = [
     { label: "Domov", value: "/", icon: <HomeIcon /> },
-    { label: "Hľadať", value: "/hladat", icon: <SearchIcon /> },
-    { label: "Pridať", value: "/prispevok", icon: <AddCircleIcon /> },
+    { label: "Hľadať", value: "/hladanie", icon: <SearchIcon /> },
+    { label: "Pridať", value: "/pridat", icon: <AddCircleIcon /> },
+    { label: "Prispevok", value: "/prispevok", icon: <AddCircleIcon /> },
+    { label: "Notifikacie", value: "/notifikacie", icon: <SearchIcon /> },
     {
       label: "Profil",
       value: "/profil",
