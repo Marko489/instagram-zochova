@@ -9,6 +9,8 @@ import AuthHomeView from "../../sections/AuthHomeView";
 
 export const metadata = { title: "Domov | ZoškaSnap" };
 
+// Add dynamic directive to force dynamic rendering
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   try {
@@ -16,8 +18,7 @@ export default async function HomePage() {
 
     if (!session) {
       return <NonAuthHomeView />;
-    }
-    else {
+    } else {
       return <AuthHomeView session={session} />;
     }
 
@@ -26,3 +27,36 @@ export default async function HomePage() {
     return <NonAuthHomeView />;
   }
 }
+
+
+
+
+
+
+
+
+
+// import { getServerSession } from "next-auth";
+// import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+// import NonAuthHomeView from "../../sections/NonAuthHomeView";
+// import AuthHomeView from "../../sections/AuthHomeView";
+
+// export const metadata = { title: "Domov | ZoškaSnap" };
+
+
+// export default async function HomePage() {
+//   try {
+//     const session = await getServerSession(authOptions);
+
+//     if (!session) {
+//       return <NonAuthHomeView />;
+//     }
+//     else {
+//       return <AuthHomeView session={session} />;
+//     }
+
+//   } catch (error) {
+//     console.error("Error fetching session:", error);
+//     return <NonAuthHomeView />;
+//   }
+// }
