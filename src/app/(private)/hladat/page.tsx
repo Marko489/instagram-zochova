@@ -17,18 +17,33 @@
 // }
 
 
-
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import SearchComponent from "@/components/SearchComponent"; // Import search bar
+import Box from "@mui/material/Box";
+import { SearchProvider } from "@/app/context/SearchContext";
+import SearchComponent from "@/components/SearchComponent";
+import ProfileTeaserList from "@/components/ProfileTeaserList";
 
-export const metadata = { title: "Hľadanie | ZoškaSnap" };
-
-export default function Find() {
+export default function SearchPage() {
   return (
-    <Container>
-      <Typography variant="h4">Hľadanie</Typography>
-      <SearchComponent /> {/* Render search bar */}
-    </Container>
+    <SearchProvider>
+      <Container maxWidth="md">
+        <Box 
+          sx={{ 
+            display: "flex", 
+            flexDirection: "column", 
+            justifyContent: "center", 
+            alignItems: "center", // Centers horizontally only
+            textAlign: "center", // Ensures text inside is centered
+            width: "100%", 
+          }}
+        >
+          <SearchComponent />
+          <Box mt={4}> {/* Adds spacing between search and profile list */}
+            <ProfileTeaserList />
+          </Box>
+        </Box>
+      </Container>
+    </SearchProvider>
   );
 }

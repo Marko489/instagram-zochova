@@ -1,14 +1,32 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images: {
-      domains: ["picsum.photos", "loremflickr.com"], // Add both external domains here
-    },
-  };
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+      },
+      {
+        protocol: "https",
+        hostname: "loremflickr.com",
+      },
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "cloudflare-ipfs.com",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com", // Google profile images
+      },
+    ],
+  },
+};
 
-  export default nextConfig;
-
-
-
+export default nextConfig;
 
 // /** @type {import('next').NextConfig} */
 // const nextConfig = {
