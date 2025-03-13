@@ -76,13 +76,13 @@ export default function SearchComponent() {
       } catch (error) {
         console.error("Error fetching users:", error);
       }
-    };
+    }
 
     const debouncedFetch = debounce(fetchUsers, 300);
     debouncedFetch();
 
     return () => debouncedFetch.cancel();
-  }, [query]);
+  }, [query, setSearchResults, setDefaultUsers]);
 
   return (
     <TextField
