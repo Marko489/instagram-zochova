@@ -176,6 +176,7 @@ export default function Navbar() {
   };
 
   const handleProfileClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation(); // ✅ Prevents navigation
     setAnchorEl(event.currentTarget);
   };
 
@@ -194,18 +195,6 @@ export default function Navbar() {
     { label: "Domov", value: "/prispevok", icon: <HomeIcon /> },
     { label: "Hľadať", value: "/hladat", icon: <SearchIcon /> },
     { label: "Pridať", value: "/pridat", icon: <AddCircleIcon /> },
-    {
-      label: "Profil",
-      value: "/profile",
-      icon: (
-        <Avatar
-          alt={session?.user?.name || "User"}
-          src={session?.user?.image || undefined}
-          onClick={handleProfileClick}
-          sx={{ cursor: "pointer" }}
-        />
-      ),
-    },
   ];
 
   return (
@@ -220,36 +209,55 @@ export default function Navbar() {
             sx={{ color: pathname === path.value ? "blue" : "inherit" }}
           />
         ))}
+
+        {/* ✅ Profile Button (Now it ONLY opens popup, doesn't navigate) */}
+        {status === "authenticated" && (
+          <BottomNavigationAction
+            label="Profil"
+            icon={
+              <Avatar
+                alt={session?.user?.name || "User"}
+                src={session?.user?.image || undefined}
+                sx={{ cursor: "pointer" }}
+                onClick={handleProfileClick} // ✅ Opens menu, doesn't navigate
+              />
+            }
+          />
+        )}
       </BottomNavigation>
 
-      {status === "authenticated" && (
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
-          transformOrigin={{ vertical: "bottom", horizontal: "center" }}
-          sx={{ transform: "translateY(-10px)" }} // Moves it higher
+      {/* ✅ Profile Menu */}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        transformOrigin={{ vertical: "bottom", horizontal: "center" }}
+        sx={{ transform: "translateY(-10px)" }} // Moves it higher
+      >
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            router.push("/profile"); // ✅ Navigates to profile page when clicked
+          }}
         >
-          <MenuItem onClick={() => router.push("/profile")}>
-            <ListItemIcon>
-              <AccountCircleIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="Profil" />
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              handleClose();
-              signOut();
-            }}
-          >
-            <ListItemIcon>
-              <LogoutIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="Odhlásiť sa" />
-          </MenuItem>
-        </Menu>
-      )}
+          <ListItemIcon>
+            <AccountCircleIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Profil" />
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            signOut();
+          }}
+        >
+          <ListItemIcon>
+            <LogoutIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Odhlásiť sa" />
+        </MenuItem>
+      </Menu>
 
       <IconButton
         onClick={handleThemeToggle}

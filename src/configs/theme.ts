@@ -1,5 +1,16 @@
 import { createTheme } from "@mui/material";
 
+
+declare module "@mui/material/styles" {
+  interface Palette {
+    addImage: Palette["primary"];
+  }
+  interface PaletteOptions {
+    addImage?: PaletteOptions["primary"];
+  }
+
+  
+}
 export const lightTheme = createTheme({
   palette: {
     mode: "light",
@@ -8,6 +19,16 @@ export const lightTheme = createTheme({
     },
     secondary: {
       main: "#ff4081",
+    },
+
+
+
+
+
+
+
+    addImage: {
+      main: "#ff4081", // Pink
     },
     background: {
       default: "#f5f5f5",
@@ -31,6 +52,9 @@ export const darkTheme = createTheme({
     },
     secondary: {
       main: "#ff4081",
+    },
+    addImage: {
+      main: "#9c27b0", // Purple
     },
     background: {
       default: "#121212",

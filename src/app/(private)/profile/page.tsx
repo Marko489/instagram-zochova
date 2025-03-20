@@ -1,17 +1,14 @@
-// src/app/profil/page.tsx
 
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
+import Container from "@mui/material/Container";
+import ProfileLookup from "@/components/ProfileLookup"; // ✅ Import the ProfileLookup component
 
-export const metadata = { title: "Zoznam profilov | ZoškaSnap"}
+export const metadata = { title: "Profil | ZoškaSnap" };
 
-
-export default function Profilelisting() {
+export default function ProfilePage() {
   return (
-
     <Container>
-      <Typography>Listing profilov</Typography>
+      
+      <ProfileLookup /> {/* ✅ Display the ProfileLookup component */}
     </Container>
-
   );
 }
