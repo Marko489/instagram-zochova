@@ -64,10 +64,15 @@
 
 
 // src/app/(private)/prispevok/page.tsx
-import PostsList from "@/components/PostsList"; // Import the component
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../api/auth/[...nextauth]/authOptions"; // Adjust the import path if needed
+import PostsList from "@/components/PostsList";
 
 export const metadata = { title: "Zoznam prispevkov | INSTAGRAM" };
 
-export default function PostsPage() {
-  return <PostsList />; // Just render the PostsList component
+export default async function PostsPage() {
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
+
+  return <PostsList userId={userId || ""} />;
 }

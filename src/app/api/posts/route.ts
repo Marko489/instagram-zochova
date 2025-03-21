@@ -47,6 +47,7 @@ export async function GET() {
                 caption: true,
                 user: {
                     select: {
+                        id: true,
                         name: true, // Fetch the username of the post's author
                     },
                 },
