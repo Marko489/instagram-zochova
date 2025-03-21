@@ -1,5 +1,9 @@
-//  prisma\schema.prisma
+// npx prisma format
+// npx prisma migrate dev --name init
+// npx prisma generate
+// npx prisma studio
 
+//  prisma\schema.prisma
 
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
@@ -11,7 +15,7 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
- 
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -110,9 +114,3 @@ model Profile {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
-
-
-
-
-
-
