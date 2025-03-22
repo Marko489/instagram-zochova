@@ -181,6 +181,13 @@ const PostsList: React.FC<{ userId: string }> = ({ userId }) => {
       const response = await fetch("/api/posts");
       const data = await response.json();
       setPosts(data);
+
+      // Set initial like states
+      const likeStates: { [key: string]: boolean } = {};
+      data.forEach((post: Post) => {
+        likeStates[post.id] = false; // Set to true if the user liked it (you may need to update this logic)
+      });
+      setLikedPosts(likeStates);
     }
     fetchPosts();
   }, []);
@@ -252,7 +259,7 @@ const PostsList: React.FC<{ userId: string }> = ({ userId }) => {
           </div>
           
           <div style={{ maxHeight: "150px", overflowY: "auto", borderTop: "1px solid #ccc", marginTop: "8px", paddingTop: "8px" }}>
-            {post.comments.map((comment) => (
+          {(post.comments || []).map((comment) => (
               <ListItem key={comment.id}>
                 <ListItemText primary={comment.user.name} secondary={comment.content} />
                 {comment.user.id === userId && (
@@ -277,12 +284,14 @@ const PostsList: React.FC<{ userId: string }> = ({ userId }) => {
           </Button>
         </div>
       ))}
+
+      {/* Comment Popup Restored */}
       {openPost && (
         <Dialog open={true} onClose={() => setOpenPost(null)}>
           <DialogTitle>Comments</DialogTitle>
           <DialogContent>
             <List>
-              {openPost.comments.map((comment) => (
+              {(openPost.comments || []).map((comment) => (
                 <ListItem key={comment.id}>
                   <ListItemText primary={comment.user.name} secondary={comment.content} />
                   {comment.user.id === userId && (

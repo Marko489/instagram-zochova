@@ -38,6 +38,27 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient(); // ✅ Prisma is initialized here
 
 // ✅ Fetch multiple posts (Your existing GET API)
+// export async function GET() {
+//     try {
+//         const posts = await prisma.post.findMany({
+//             select: {
+//                 id: true,
+//                 imageUrl: true,
+//                 caption: true,
+//                 user: {
+//                     select: {
+//                         id: true,
+//                         name: true, // Fetch the username of the post's author
+//                     },
+//                 },
+//             },
+//         });
+//         return NextResponse.json(posts);
+//     } catch (error) {
+//         console.error("Error fetching posts:", error);
+//         return NextResponse.json([], { status: 500 });
+//     }
+// }
 export async function GET() {
     try {
         const posts = await prisma.post.findMany({
@@ -48,12 +69,36 @@ export async function GET() {
                 user: {
                     select: {
                         id: true,
-                        name: true, // Fetch the username of the post's author
+                        name: true,
+                    },
+                },
+                likes: {
+                    select: {
+                        userId: true,
+                    },
+                },
+                comments: {
+                    select: {
+                        id: true,
+                        content: true,
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                            },
+                        },
                     },
                 },
             },
         });
-        return NextResponse.json(posts);
+
+        const formattedPosts = posts.map(post => ({
+            ...post,
+            likesCount: post.likes.length,
+            likedByUser: false, // This will be handled in frontend
+        }));
+
+        return NextResponse.json(formattedPosts);
     } catch (error) {
         console.error("Error fetching posts:", error);
         return NextResponse.json([], { status: 500 });

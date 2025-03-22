@@ -11,8 +11,8 @@ export async function POST(req: Request) {
     const { postId } = await req.json();
     const userId = session.user.id;
 
-    const existingLike = await prisma.like.findUnique({
-      where: { userId_postId: { userId, postId } },
+    const existingLike = await prisma.like.findFirst({
+      where: { userId, postId },
     });
 
     if (existingLike) {
@@ -23,6 +23,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Post liked successfully" });
     }
   } catch (error) {
+    console.error("Like API error:", error);
     return NextResponse.json({ error: "Failed to like/unlike post" }, { status: 500 });
   }
 }
