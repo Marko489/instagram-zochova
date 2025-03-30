@@ -64,9 +64,23 @@
 
 
 // src/app/(private)/prispevok/page.tsx
+// import { getServerSession } from "next-auth";
+// import { authOptions } from "../../api/auth/[...nextauth]/authOptions"; // Adjust the import path if needed
+// import PostsList from "@/components/PostsList";
+
+// export const metadata = { title: "Zoznam prispevkov | INSTAGRAM" };
+
+// export default async function PostsPage() {
+//   const session = await getServerSession(authOptions);
+//   const userId = session?.user?.id;
+
+//   return <PostsList userId={userId || ""} />;
+// }
+
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../api/auth/[...nextauth]/authOptions"; // Adjust the import path if needed
-import PostsList from "@/components/PostsList";
+import Feed from "@/components/Feed"; // Assuming Feed component is placed in components folder
 
 export const metadata = { title: "Zoznam prispevkov | INSTAGRAM" };
 
@@ -74,5 +88,11 @@ export default async function PostsPage() {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;
 
-  return <PostsList userId={userId || ""} />;
+  return (
+    <div>
+      <h1>Instagram Feed</h1>
+      {/* Display the feed with the posts */}
+      <Feed userId={userId || ""} />
+    </div>
+  );
 }
