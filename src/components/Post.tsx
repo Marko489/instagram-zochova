@@ -1,5 +1,7 @@
 
 
+
+
 // import React, { useState, useEffect } from 'react';
 // import axios from 'axios';
 // import { useSession } from 'next-auth/react';
@@ -49,22 +51,31 @@
 //   };
 
 //   const handleAddComment = async () => {
-//     if (!newComment.trim()) return;
+//   if (!newComment.trim()) return;
 
-//     try {
-//       const response = await axios.post('/api/feed/addComment', {
-//         postId: post.id,
-//         userId: session?.user.id,
-//         content: newComment,
-//       });
+//   try {
+//     const response = await axios.post('/api/feed/addComment', {
+//       postId: post.id,
+//       userId: session?.user.id,
+//       content: newComment,
+//     });
 
-//       const addedComment = response.data;
-//       setComments([...comments, { content: addedComment.content, user: { name: session?.user.name } }]);
-//       setNewComment('');
-//     } catch (error) {
-//       console.error('Error adding comment:', error);
-//     }
-//   };
+//     const addedComment = response.data;
+
+//     // Add the new comment with all required data, like id and userId
+//     setComments([...comments, { 
+//       id: addedComment.id, 
+//       content: addedComment.content, 
+//       userId: addedComment.userId, 
+//       user: { name: session?.user.name } 
+//     }]);
+
+//     setNewComment('');
+//   } catch (error) {
+//     console.error('Error adding comment:', error);
+//   }
+// };
+
 
 //   const handleDeleteComment = async (commentId: string) => {
 //     try {
@@ -183,8 +194,7 @@
 //               backgroundColor: '#fff',
 //               padding: '20px',
 //               borderRadius: '8px',
-//               width: '300px',
-//               maxHeight: '500px', // Max height for the card
+//               width: '450px', // Increased width for a larger popup
 //               boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
 //             }}
 //             onClick={(e) => e.stopPropagation()}
@@ -204,11 +214,11 @@
 //               ✖
 //             </button>
             
-//             {/* Comment overview window */}
+//             {/* Comment overview window with fixed height and scrollable content */}
 //             <div
 //               style={{
 //                 backgroundColor: '#f9f9f9',
-//                 maxHeight: '300px', // Fixed height for the comment window
+//                 height: '400px', // Fixed height for the comment section
 //                 overflowY: 'auto',
 //                 padding: '10px',
 //                 marginBottom: '10px',
@@ -216,7 +226,7 @@
 //                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
 //               }}
 //             >
-//               {comments.slice(0, 7).map((comment: any) => (
+//               {comments.slice(0, 40).map((comment: any) => (
 //                 <div key={comment.id} style={{ marginBottom: '10px' }}>
 //                   <p><strong>{comment.user.name}</strong>: {comment.content}</p>
 //                   {comment.userId === session?.user.id && (
@@ -272,11 +282,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
-import { FaRegComment, FaRegBookmark, FaBookmark } from 'react-icons/fa'; // Import icons for comments and bookmarks
+import { FaRegComment, FaRegBookmark, FaBookmark, FaTrash } from 'react-icons/fa'; // Import trashcan icon
 
 const Post = ({ post }: { post: any }) => {
   const { data: session } = useSession();
-  const [likes, setLikes] = useState(post.likes.length); // Ensure this is set correctly
+  const [likes, setLikes] = useState(post.likes.length);
   const [isLiked, setIsLiked] = useState(post.likes.some((like: any) => like.userId === session?.user.id));
   const [comments, setComments] = useState(post.comments);
   const [newComment, setNewComment] = useState('');
@@ -284,7 +294,6 @@ const Post = ({ post }: { post: any }) => {
   const [isBookmarked, setIsBookmarked] = useState(post.bookmarks.some((bookmark: any) => bookmark.userId === session?.user.id));
   const [loading, setLoading] = useState(false);
 
-  // Fetch updated post data on page load
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -308,7 +317,7 @@ const Post = ({ post }: { post: any }) => {
         userId: session?.user.id,
         postId: post.id,
       });
-  
+
       setLikes(response.data.likes);
       setIsLiked(response.data.isLiked);
     } catch (error) {
@@ -328,7 +337,14 @@ const Post = ({ post }: { post: any }) => {
       });
 
       const addedComment = response.data;
-      setComments([...comments, { content: addedComment.content, user: { name: session?.user.name } }]);
+
+      setComments([...comments, { 
+        id: addedComment.id, 
+        content: addedComment.content, 
+        userId: addedComment.userId, 
+        user: { name: session?.user.name } 
+      }]);
+
       setNewComment('');
     } catch (error) {
       console.error('Error adding comment:', error);
@@ -377,14 +393,12 @@ const Post = ({ post }: { post: any }) => {
     <div style={{ marginBottom: '20px', padding: '10px', border: '1px solid #ddd', borderRadius: '8px' }}>
       <h3>{post.user.name}</h3>
 
-      {/* Image of the post */}
       <img
         src={post.imageUrl}
         alt="Post"
         style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
       />
-      
-      {/* Icons placed above the caption but below the image */}
+
       <div style={{ display: 'flex', gap: '10px', marginTop: '10px', marginBottom: '10px' }}>
         <button
           onClick={handleLike}
@@ -425,10 +439,8 @@ const Post = ({ post }: { post: any }) => {
         </button>
       </div>
 
-      {/* Caption below the icons */}
       <p>{post.caption}</p>
 
-      {/* Comment popup card */}
       {showPopup && (
         <div
           className="popup-overlay"
@@ -452,8 +464,7 @@ const Post = ({ post }: { post: any }) => {
               backgroundColor: '#fff',
               padding: '20px',
               borderRadius: '8px',
-              width: '350px', // Fixed width
-              maxHeight: '450px', // Fixed max height for the card
+              width: '450px',
               boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
             }}
             onClick={(e) => e.stopPropagation()}
@@ -472,12 +483,11 @@ const Post = ({ post }: { post: any }) => {
             >
               ✖
             </button>
-            
-            {/* Comment overview window */}
+
             <div
               style={{
                 backgroundColor: '#f9f9f9',
-                maxHeight: '250px', // Fixed height for the comment window
+                height: '400px',
                 overflowY: 'auto',
                 padding: '10px',
                 marginBottom: '10px',
@@ -485,22 +495,31 @@ const Post = ({ post }: { post: any }) => {
                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
               }}
             >
-              {comments.slice(0, 7).map((comment: any) => (
-                <div key={comment.id} style={{ marginBottom: '10px' }}>
+              {comments.slice(0, 40).map((comment: any) => (
+                <div
+                  key={comment.id}
+                  style={{ marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                >
                   <p><strong>{comment.user.name}</strong>: {comment.content}</p>
+
                   {comment.userId === session?.user.id && (
                     <button
                       onClick={() => handleDeleteComment(comment.id)}
-                      style={{ color: 'red', fontSize: '14px', cursor: 'pointer' }}
+                      style={{
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        color: 'red',
+                        fontSize: '18px',
+                        cursor: 'pointer',
+                      }}
                     >
-                      Delete
+                      <FaTrash />
                     </button>
                   )}
                 </div>
               ))}
             </div>
 
-            {/* Add comment section */}
             <input
               type="text"
               value={newComment}
