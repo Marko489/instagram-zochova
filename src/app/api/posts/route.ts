@@ -1,158 +1,105 @@
+// import { IncomingMessage } from 'http';
+// import { IncomingForm, Fields, Files } from 'formidable';
+// import { NextApiRequest, NextApiResponse } from 'next';
+// import { uploadToBlob } from '@/lib/upload'; // Path to your upload function
 
-// src\app\api\posts\route.ts
+// export const config = {
+//   api: {
+//     bodyParser: false, // Disable built-in body parser to handle file uploads manually
+//   },
+// };
 
-// import { NextResponse } from "next/server";
-// import { PrismaClient } from "@prisma/client";
+// const uploadHandler = (req: NextApiRequest, res: NextApiResponse) => {
+//   const form = new IncomingForm();
 
-// const prisma = new PrismaClient();
-
-// export async function GET() {
-//   try {
-//     const posts = await prisma.post.findMany({
-//       select: {
-//         id: true,
-//         imageUrl: true,
-//         caption: true,
-//         user: {
-//           select: {
-//             name: true, // Fetch the username of the post's author
-//           },
-//         },
-//       },
-//     });
-//     return NextResponse.json(posts);
-//   } catch (error) {
-//     console.error("Error fetching posts:", error);
-//     return NextResponse.json([], { status: 500 });
-//   }
-// }
-
-
-
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-// import { writeFile } from "fs/promises";
-// import path from "path";
-
-
-const prisma = new PrismaClient(); // ✅ Prisma is initialized here
-
-// ✅ Fetch multiple posts (Your existing GET API)
-// export async function GET() {
-//     try {
-//         const posts = await prisma.post.findMany({
-//             select: {
-//                 id: true,
-//                 imageUrl: true,
-//                 caption: true,
-//                 user: {
-//                     select: {
-//                         id: true,
-//                         name: true, // Fetch the username of the post's author
-//                     },
-//                 },
-//             },
-//         });
-//         return NextResponse.json(posts);
-//     } catch (error) {
-//         console.error("Error fetching posts:", error);
-//         return NextResponse.json([], { status: 500 });
+//   form.parse(req, async (err: Error | null, fields: Fields, files: Files) => {
+//     if (err) {
+//       res.status(500).json({ error: 'Error during file upload' });
+//       return;
 //     }
-// }
-export async function GET() {
-    try {
-        const posts = await prisma.post.findMany({
-            select: {
-                id: true,
-                imageUrl: true,
-                caption: true,
-                user: {
-                    select: {
-                        id: true,
-                        name: true,
-                    },
-                },
-                likes: {
-                    select: {
-                        userId: true,
-                    },
-                },
-                comments: {
-                    select: {
-                        id: true,
-                        content: true,
-                        user: {
-                            select: {
-                                id: true,
-                                name: true,
-                            },
-                        },
-                    },
-                },
-            },
+
+//     try {
+//       // Extract caption, ensuring it's a string
+//       const caption = fields.caption ? (Array.isArray(fields.caption) ? fields.caption[0] : fields.caption) : '';
+
+//       // Ensure the file is correctly typed from formidable.File to a native File object
+//       const formidableFile = files.file as formidable.File;
+//       const fileForUpload = new File([formidableFile.file], formidableFile.originalFilename, {
+//         type: formidableFile.mimetype,
+//       });
+
+//       // Upload the file to Vercel Blob
+//       const imageUrl = await uploadToBlob(fileForUpload);
+
+//       // Return the uploaded image URL and caption
+//       res.status(200).json({
+//         imageUrl,
+//         caption,
+//       });
+//     } catch (uploadErr) {
+//       res.status(500).json({ error: 'Error uploading the image' });
+//     }
+//   });
+// };
+
+// export default uploadHandler;
+
+
+import { IncomingMessage } from 'http'; // Import IncomingMessage from 'http'
+import { NextRequest, NextResponse } from 'next/server';
+import { IncomingForm } from 'formidable';
+import { uploadToBlob } from '@/lib/upload'; // Path to your upload function
+
+export const config = {
+  api: {
+    bodyParser: false, // Disable built-in body parser to handle file uploads manually
+  },
+};
+
+export const POST = async (req: NextRequest) => {
+  return new Promise((resolve, reject) => {
+    // Convert NextRequest to IncomingMessage
+    const incomingReq = req as unknown as IncomingMessage; // Casting NextRequest to IncomingMessage
+
+    const form = new IncomingForm();
+
+    form.parse(incomingReq, async (err: Error | null, fields: any, files: any) => {
+      if (err) {
+        resolve(
+          NextResponse.json({ error: 'Error during file upload' }, { status: 500 })
+        );
+        return;
+      }
+
+      try {
+        // Extract caption, ensuring it's a string
+        const caption = fields.caption
+          ? Array.isArray(fields.caption)
+            ? fields.caption[0]
+            : fields.caption
+          : '';
+
+        // Ensure the file is correctly typed from formidable.File to a native File object
+        const formidableFile = files.file[0]; // The file should be in an array format, so access the first item
+        const buffer = formidableFile.file; // Get the file buffer
+
+        // Create a new File object for the upload (browsers require this type of constructor)
+        const fileForUpload = new File([buffer], formidableFile.originalFilename, {
+          type: formidableFile.mimetype,
         });
 
-        const formattedPosts = posts.map(post => ({
-            ...post,
-            likesCount: post.likes.length,
-            likedByUser: false, // This will be handled in frontend
-        }));
+        // Upload the file to Vercel Blob
+        const imageUrl = await uploadToBlob(fileForUpload);
 
-        return NextResponse.json(formattedPosts);
-    } catch (error) {
-        console.error("Error fetching posts:", error);
-        return NextResponse.json([], { status: 500 });
-    }
-}
-
-
-
-// add new POSTS to the web
-
-import { uploadToCloud } from "@/lib/upload";
-
-
-
-export async function POST(req: Request) {
-  try {
-    const formData = await req.formData();
-    const image = formData.get("image") as File;
-    const caption = formData.get("caption") as string;
-    const userId = formData.get("userId") as string;
-
-    if (!image || !caption || !userId) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-    }
-
-    // Upload image to cloud storage (this function must be defined in lib/upload.ts)
-    const imageUrl = await uploadToCloud(image);
-
-    // Store post in database with the cloud image URL
-    const post = await prisma.post.create({
-      data: { imageUrl, caption, userId },
+        // Return the uploaded image URL and caption
+        resolve(
+          NextResponse.json({ imageUrl, caption }, { status: 200 })
+        );
+      } catch (uploadErr) {
+        resolve(
+          NextResponse.json({ error: 'Error uploading the image' }, { status: 500 })
+        );
+      }
     });
-
-    return NextResponse.json(post);
-  } catch (error) {
-    console.error("Error creating post:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
-}
-
-// ✅ Delete a post by ID
-export async function DELETE(req: Request) {
-    try {
-        const { id } = await req.json();
-
-        if (!id) {
-            return NextResponse.json({ error: "Post ID is required" }, { status: 400 });
-        }
-
-        await prisma.post.delete({ where: { id } });
-
-        return NextResponse.json({ message: "Post deleted" }, { status: 200 });
-    } catch (error) {
-        console.error("Error deleting post:", error);
-        return NextResponse.json({ error: "Failed to delete post" }, { status: 500 });
-    }
-}
+  });
+};
