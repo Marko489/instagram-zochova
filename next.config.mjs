@@ -22,11 +22,16 @@ const nextConfig = {
         protocol: "https",
         hostname: "lh3.googleusercontent.com", // Google profile images
       },
+      {
+        protocol: "https",
+        hostname: "x3mnpbrlwcvxuzmy.public.blob.vercel-storage.com", // Added blob domain
+      },
     ],
   },
 };
 
 export default nextConfig;
+
 
 // /** @type {import('next').NextConfig} */
 // const nextConfig = {

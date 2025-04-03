@@ -44,62 +44,124 @@
 
 // export default uploadHandler;
 
+// src/app/api/posts/route.ts
 
-import { IncomingMessage } from 'http'; // Import IncomingMessage from 'http'
+// src/app/api/posts/route.ts
+// src/app/api/posts/route.ts
+
+// src/app/api/posts/route.ts
+
+// src/app/api/posts/route.ts
+
+// import { NextRequest, NextResponse } from 'next/server';
+// import { uploadToBlob } from '@/lib/upload';
+// import { prisma } from '@/app/api/auth/[...nextauth]/prisma'; // Assuming you have a prisma instance
+
+// export const POST = async (req: NextRequest) => {
+//   try {
+//     const formData = await req.formData();
+//     const caption = formData.get('caption')?.toString() || '';
+//     const file = formData.get('file') as File;
+
+//     if (!file) {
+//       return NextResponse.json({ error: 'File not found' }, { status: 400 });
+//     }
+
+//     const imageUrl = await uploadToBlob(file);
+
+//     // Create the new post in the database
+//     const newPost = await prisma.post.create({
+//       data: {
+//         userId: 'userId', // Replace with the actual userId (you'll likely get it from the session)
+//         imageUrl: imageUrl,
+//         caption: caption,
+//       },
+//     });
+
+//     return NextResponse.json(newPost, { status: 200 });
+//   } catch (err) {
+//     return NextResponse.json({ error: 'Error uploading the file' }, { status: 500 });
+//   }
+// };
+
+
+// import { NextRequest, NextResponse } from 'next/server';
+// import { uploadToBlob } from '@/lib/upload';
+// import { prisma } from '@/app/api/auth/[...nextauth]/prisma'; // Import Prisma client
+
+// export const POST = async (req: NextRequest) => {
+//   try {
+//     // Get form data (caption and file)
+//     const formData = await req.formData();
+//     const caption = formData.get('caption')?.toString() || '';
+//     const file = formData.get('file') as File;
+
+//     if (!file) {
+//       return NextResponse.json({ error: 'File not found' }, { status: 400 });
+//     }
+
+//     // Upload the file to blob storage
+//     const imageUrl = await uploadToBlob(file);
+
+//     // Save the post to the database
+//     const post = await prisma.post.create({
+//       data: {
+//         userId: "USER_ID", // Replace with the actual user ID, you may need to retrieve it from session or JWT
+//         imageUrl: imageUrl,
+//         caption: caption,
+//       },
+//     });
+
+//     // Return the response with the created post
+//     return NextResponse.json(post, { status: 200 });
+//   } catch (err) {
+//     console.error('Error creating post:', err);
+//     return NextResponse.json({ error: 'Error creating post' }, { status: 500 });
+//   }
+// };
+
+
 import { NextRequest, NextResponse } from 'next/server';
-import { IncomingForm } from 'formidable';
-import { uploadToBlob } from '@/lib/upload'; // Path to your upload function
-
-export const config = {
-  api: {
-    bodyParser: false, // Disable built-in body parser to handle file uploads manually
-  },
-};
+import { uploadToBlob } from '@/lib/upload';
+import { prisma } from '@/app/api/auth/[...nextauth]/prisma'; // Import Prisma client
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/authOptions'; // Import authOptions to get session
 
 export const POST = async (req: NextRequest) => {
-  return new Promise((resolve, reject) => {
-    // Convert NextRequest to IncomingMessage
-    const incomingReq = req as unknown as IncomingMessage; // Casting NextRequest to IncomingMessage
+  try {
+    // Get the session (including the user ID)
+    const session = await getServerSession(authOptions);
 
-    const form = new IncomingForm();
+    if (!session || !session.user.id) {
+      return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
+    }
 
-    form.parse(incomingReq, async (err: Error | null, fields: any, files: any) => {
-      if (err) {
-        resolve(
-          NextResponse.json({ error: 'Error during file upload' }, { status: 500 })
-        );
-        return;
-      }
+    // Get form data (caption and file)
+    const formData = await req.formData();
+    const caption = formData.get('caption')?.toString() || '';
+    const file = formData.get('file') as File;
 
-      try {
-        // Extract caption, ensuring it's a string
-        const caption = fields.caption
-          ? Array.isArray(fields.caption)
-            ? fields.caption[0]
-            : fields.caption
-          : '';
+    if (!file) {
+      return NextResponse.json({ error: 'File not found' }, { status: 400 });
+    }
 
-        // Ensure the file is correctly typed from formidable.File to a native File object
-        const formidableFile = files.file[0]; // The file should be in an array format, so access the first item
-        const buffer = formidableFile.file; // Get the file buffer
+    // Upload the file to blob storage
+    const imageUrl = await uploadToBlob(file);
 
-        // Create a new File object for the upload (browsers require this type of constructor)
-        const fileForUpload = new File([buffer], formidableFile.originalFilename, {
-          type: formidableFile.mimetype,
-        });
-
-        // Upload the file to Vercel Blob
-        const imageUrl = await uploadToBlob(fileForUpload);
-
-        // Return the uploaded image URL and caption
-        resolve(
-          NextResponse.json({ imageUrl, caption }, { status: 200 })
-        );
-      } catch (uploadErr) {
-        resolve(
-          NextResponse.json({ error: 'Error uploading the image' }, { status: 500 })
-        );
-      }
+    // Save the post to the database
+    const post = await prisma.post.create({
+      data: {
+        userId: session.user.id, // Use the user ID from the session
+        imageUrl: imageUrl,
+        caption: caption,
+      },
     });
-  });
+
+    // Return the response with the created post
+    return NextResponse.json(post, { status: 200 });
+  } catch (err) {
+    console.error('Error creating post:', err);
+    return NextResponse.json({ error: 'Error creating post' }, { status: 500 });
+  }
 };
+
