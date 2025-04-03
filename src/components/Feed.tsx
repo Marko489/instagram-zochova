@@ -38,6 +38,50 @@
 // };
 
 // export default Feed;
+// 'use client';
+// import React, { useEffect, useState } from 'react';
+// import axios from 'axios';
+// import Post from './Post'; // Assuming Post component is in the components folder
+// import { Box, Paper } from '@mui/material';
+
+// interface PostType {
+//   id: string;
+//   content: string;  // Add any other fields based on your post structure
+// }
+
+// const Feed = () => {
+//   const [posts, setPosts] = useState<PostType[]>([]);
+
+//   useEffect(() => {
+//     const fetchPosts = async () => {
+//       try {
+//         const response = await axios.get('/api/feed/getPosts');
+//         setPosts(response.data);
+//       } catch (error) {
+//         console.error('Error fetching posts:', error);
+//       }
+//     };
+
+//     fetchPosts();
+//   }, []);
+
+//   return (
+//     <Box sx={{ padding: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+//       {/* Wrap posts in a container with a max-width */}
+//       <Box sx={{ maxWidth: 600, width: '100%' }}>
+//         {posts.map((post) => (
+//           <Paper elevation={3} sx={{ padding: 2, marginBottom: 2 }} key={post.id}>
+//             <Post post={post} />
+//           </Paper>
+//         ))}
+//       </Box>
+//     </Box>
+//   );
+// };
+
+// export default Feed;
+
+
 'use client';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -46,16 +90,31 @@ import { Box, Paper } from '@mui/material';
 
 interface PostType {
   id: string;
-  content: string;  // Add any other fields based on your post structure
+  content: string;
+  likes: { userId: string }[];
+  comments: {
+    id: string;
+    content: string;
+    userId: string;
+    user: { name: string | null };
+  }[];
+  bookmarks: { userId: string }[];
+  user: { name: string };
+  imageUrl: string;
+  caption: string;
 }
 
-const Feed = () => {
+interface FeedProps {
+  userId: string;
+}
+
+const Feed: React.FC<FeedProps> = ({ userId }) => {
   const [posts, setPosts] = useState<PostType[]>([]);
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get('/api/feed/getPosts');
+        const response = await axios.get(`/api/feed/getPosts?userId=${userId}`);
         setPosts(response.data);
       } catch (error) {
         console.error('Error fetching posts:', error);
@@ -63,11 +122,10 @@ const Feed = () => {
     };
 
     fetchPosts();
-  }, []);
+  }, [userId]);
 
   return (
     <Box sx={{ padding: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      {/* Wrap posts in a container with a max-width */}
       <Box sx={{ maxWidth: 600, width: '100%' }}>
         {posts.map((post) => (
           <Paper elevation={3} sx={{ padding: 2, marginBottom: 2 }} key={post.id}>
